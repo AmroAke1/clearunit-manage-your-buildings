@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{% if edit %}Edit Building{% else %}Add Building{% endif %} — ClearUnit{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto">
+    <div class="mb-6 flex items-center gap-2 text-sm text-gray-400">
+        <a href="{{ url_for('manager.buildings') }}" class="hover:text-[#C9A84C]">Buildings</a>
+        <span>›</span>
+        <span class="text-gray-600">{% if edit %}Edit {{ building.name }}{% else %}Add Building{% endif %}</span>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-[#0B1F3A] px-8 py-5">
+            <h1 class="text-white text-xl font-semibold">
+                {% if edit %}Edit Building{% else %}Add New Building{% endif %}
+            </h1>
+            <p class="text-gray-400 text-sm mt-1">
+                {% if edit %}Update building information{% else %}Register a new property to your portfolio{% endif %}
+            </p>
+        </div>
+        <div class="px-8 py-8">
+            <form method="POST" action="{% if edit %}{{ url_for('manager.edit_building', building_id=building.id) }}{% else %}{{ url_for('manager.add_building') }}{% endif %}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="mb-5">
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Building Name</label>
+                    <input type="text" id="name" name="name" required
+                           value="{% if edit %}{{ building.name }}{% endif %}"
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0B1F3A] focus:border-transparent transition"
+                           placeholder="e.g. Sunrise Towers">
+                </div>
+
+                <div class="mb-8">
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <input type="text" id="address" name="address" required
+                           value="{% if edit %}{{ building.address }}{% endif %}"
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0B1F3A] focus:border-transparent transition"
+                           placeholder="e.g. 123 Main Street, City">
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button type="submit"
+                            class="bg-[#0B1F3A] hover:bg-[#162d55] text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm">
+                        {% if edit %}Save Changes{% else %}Add Building{% endif %}
+                    </button>
+                    <a href="{{ url_for('manager.buildings') }}"
+                       class="text-sm text-gray-500 hover:text-gray-700 transition-colors">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

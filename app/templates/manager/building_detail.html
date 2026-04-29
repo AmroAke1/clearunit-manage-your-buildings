@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}{{ building.name }} — ClearUnit{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <div class="flex items-center gap-2 text-sm text-gray-400 mb-1">
+            <a href="{{ url_for('manager.buildings') }}" class="hover:text-[#C9A84C]">Buildings</a>
+            <span>›</span>
+            <span class="text-gray-600">{{ building.name }}</span>
+        </div>
+        <h1 class="text-2xl font-bold text-[#0B1F3A]">{{ building.name }}</h1>
+        <p class="text-gray-500 text-sm mt-1">{{ building.address }}</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="{{ url_for('manager.edit_building', building_id=building.id) }}"
+           class="border border-[#0B1F3A] text-[#0B1F3A] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#0B1F3A] hover:text-white transition-all">
+            Edit Building
+        </a>
+        <a href="{{ url_for('manager.add_unit', building_id=building.id) }}"
+           class="bg-[#0B1F3A] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#162d55] transition-colors">
+            + Add Unit
+        </a>
+    </div>
+</div>
+
+<!-- Stats Bar -->
+<div class="grid grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4 text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Total Units</p>
+        <p class="text-3xl font-bold text-[#0B1F3A] mt-1">{{ building.units|length }}</p>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4 text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Occupied</p>
+        <p class="text-3xl font-bold text-green-600 mt-1">{{ building.units|selectattr('resident_id')|list|length }}</p>
+    </div>
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4 text-center">
+        <p class="text-xs text-gray-400 uppercase tracking-wide">Vacant</p>
+        <p class="text-3xl font-bold text-gray-400 mt-1">{{ building.units|rejectattr('resident_id')|list|length }}</p>
+    </div>
+</div>
+
+<!-- Units Table -->
+{% if building.units %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="font-semibold text-[#0B1F3A]">Units</h2>
+    </div>
+    <table class="min-w-full divide-y divide-gray-100">
+        <thead>
+            <tr class="bg-gray-50">
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Unit #</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Floor</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Resident</th>
+                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Balance</th>
+                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Assign Resident</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+            {% for unit in building.units %}
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 font-semibold text-[#0B1F3A]">{{ unit.unit_number }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">Floor {{ unit.floor }}</td>
+                <td class="px-6 py-4 text-sm">
+                    {% if unit.resident %}
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-[#C9A84C]/20 flex items-center justify-center">
+                            <span class="text-[#C9A84C] text-xs font-bold">{{ unit.resident.full_name[0].upper() }}</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-800">{{ unit.resident.full_name }}</p>
+                            <p class="text-xs text-gray-400">{{ unit.resident.email }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <span class="text-xs text-gray-400 italic">Vacant</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-right font-semibold {% if unit.current_balance > 0 %}text-red-500{% else %}text-green-600{% endif %}">
+                    ${{ "%.2f"|format(unit.current_balance) }}
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <form method="POST" action="{{ url_for('manager.assign_resident', unit_id=unit.id) }}" class="flex items-center justify-end gap-2">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <select name="resident_id"
+                                class="text-xs border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#0B1F3A] bg-white">
+                            <option value="">— Unassign —</option>
+                            {% for resident in residents %}
+                            <option value="{{ resident.id }}" {% if unit.resident_id == resident.id %}selected{% endif %}>
+                                {{ resident.full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit"
+                                class="text-xs bg-[#0B1F3A] text-white px-3 py-1.5 rounded-lg hover:bg-[#162d55] transition-colors font-medium">
+                            Save
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-10 text-center">
+    <p class="text-gray-400 text-sm mb-4">No units in this building yet.</p>
+    <a href="{{ url_for('manager.add_unit', building_id=building.id) }}"
+       class="inline-block bg-[#0B1F3A] text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-[#162d55] transition-colors">
+        Add First Unit
+    </a>
+</div>
+{% endif %}
+{% endblock %}

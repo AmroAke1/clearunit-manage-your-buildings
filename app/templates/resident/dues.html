@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}My Dues — ClearUnit{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-[#0B1F3A]">My Dues</h1>
+    <p class="text-gray-500 text-sm mt-1">
+        Unit {{ unit.unit_number }} · {{ unit.building.name }} ·
+        Balance:
+        <span class="font-semibold {% if unit.current_balance > 0 %}text-red-500{% else %}text-green-600{% endif %}">
+            ${{ "%.2f"|format(unit.current_balance) }}
+        </span>
+    </p>
+</div>
+
+{% if dues_list %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-100">
+        <thead>
+            <tr class="bg-[#0B1F3A]">
+                <th class="px-6 py-3.5 text-left text-xs font-semibold text-[#C9A84C] uppercase tracking-wider">Month</th>
+                <th class="px-6 py-3.5 text-right text-xs font-semibold text-[#C9A84C] uppercase tracking-wider">Amount</th>
+                <th class="px-6 py-3.5 text-right text-xs font-semibold text-[#C9A84C] uppercase tracking-wider">Issued On</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+            {% for due in dues_list %}
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4">
+                    <span class="inline-block bg-[#0B1F3A]/10 text-[#0B1F3A] text-xs font-semibold px-2.5 py-1 rounded-full">
+                        {{ due.month }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-right font-semibold text-[#C9A84C]">${{ "%.2f"|format(due.amount) }}</td>
+                <td class="px-6 py-4 text-right text-sm text-gray-400">{{ due.created_at.strftime('%b %d, %Y') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+    <p class="text-gray-400 text-sm">No dues have been issued to your unit yet.</p>
+</div>
+{% endif %}
+{% endblock %}

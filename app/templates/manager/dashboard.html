@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Manager Dashboard — ClearUnit{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-[#0B1F3A]">Manager Dashboard</h1>
+    <p class="text-gray-500 text-sm mt-1">Welcome back, {{ current_user.full_name }}. Here's your portfolio overview.</p>
+</div>
+
+{% if stats %}
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+    {% for s in stats %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+        <!-- Card Header -->
+        <div class="bg-[#0B1F3A] px-5 py-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-white font-semibold text-base">{{ s.building.name }}</h2>
+                <p class="text-gray-400 text-xs mt-0.5">{{ s.building.address }}</p>
+            </div>
+            <a href="{{ url_for('manager.building_detail', building_id=s.building.id) }}"
+               class="text-[#C9A84C] text-xs font-medium hover:underline">View →</a>
+        </div>
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 divide-x divide-y divide-gray-100">
+            <div class="p-4">
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Total Units</p>
+                <p class="text-2xl font-bold text-[#0B1F3A] mt-1">{{ s.total_units }}</p>
+            </div>
+            <div class="p-4">
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Pending Payments</p>
+                <p class="text-2xl font-bold mt-1 {% if s.pending_payments > 0 %}text-yellow-600{% else %}text-green-600{% endif %}">
+                    {{ s.pending_payments }}
+                </p>
+            </div>
+            <div class="p-4">
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Open Maintenance</p>
+                <p class="text-2xl font-bold mt-1 {% if s.open_maintenance > 0 %}text-red-500{% else %}text-green-600{% endif %}">
+                    {{ s.open_maintenance }}
+                </p>
+            </div>
+            <div class="p-4">
+                <p class="text-xs text-gray-400 uppercase tracking-wide">Total Balance</p>
+                <p class="text-2xl font-bold text-[#C9A84C] mt-1">${{ "%.0f"|format(s.total_balance) }}</p>
+            </div>
+        </div>
+        <!-- Actions -->
+        <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex gap-2">
+            <a href="{{ url_for('manager.building_detail', building_id=s.building.id) }}"
+               class="text-xs font-medium text-[#0B1F3A] hover:text-[#C9A84C] transition-colors">Manage Units</a>
+            <span class="text-gray-300">·</span>
+            <a href="{{ url_for('manager.payments') }}"
+               class="text-xs font-medium text-[#0B1F3A] hover:text-[#C9A84C] transition-colors">Payments</a>
+            <span class="text-gray-300">·</span>
+            <a href="{{ url_for('manager.maintenance') }}"
+               class="text-xs font-medium text-[#0B1F3A] hover:text-[#C9A84C] transition-colors">Maintenance</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Quick Actions Row -->
+<div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+    <a href="{{ url_for('manager.add_building') }}"
+       class="bg-[#0B1F3A] text-white rounded-lg px-4 py-3 text-sm font-medium text-center hover:bg-[#162d55] transition-colors">
+        + Add Building
+    </a>
+    <a href="{{ url_for('manager.create_dues') }}"
+       class="bg-[#C9A84C] text-[#0B1F3A] rounded-lg px-4 py-3 text-sm font-bold text-center hover:bg-yellow-400 transition-colors">
+        Create Dues
+    </a>
+    <a href="{{ url_for('manager.announcements') }}"
+       class="bg-white border border-gray-200 text-[#0B1F3A] rounded-lg px-4 py-3 text-sm font-medium text-center hover:bg-gray-50 transition-colors">
+        Post Announcement
+    </a>
+    <a href="{{ url_for('manager.maintenance') }}"
+       class="bg-white border border-gray-200 text-[#0B1F3A] rounded-lg px-4 py-3 text-sm font-medium text-center hover:bg-gray-50 transition-colors">
+        Maintenance Queue
+    </a>
+</div>
+
+{% else %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="text-3xl">🏢</span>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-700 mb-2">No Buildings Yet</h3>
+    <p class="text-gray-400 text-sm mb-6">Start by adding your first building to manage.</p>
+    <a href="{{ url_for('manager.add_building') }}"
+       class="inline-block bg-[#0B1F3A] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#162d55] transition-colors">
+        Add Your First Building
+    </a>
+</div>
+{% endif %}
+{% endblock %}

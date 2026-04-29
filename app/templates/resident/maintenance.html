@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Maintenance — ClearUnit{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-[#0B1F3A]">Maintenance Requests</h1>
+    <p class="text-gray-500 text-sm mt-1">Unit {{ unit.unit_number }} · {{ unit.building.name }}</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Submit Form -->
+    <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-4">
+            <div class="bg-[#0B1F3A] px-6 py-4">
+                <h2 class="text-white font-semibold">Submit New Request</h2>
+            </div>
+            <div class="p-6">
+                <form method="POST" action="{{ url_for('resident.maintenance') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-4">
+                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="description" name="description" required rows="6"
+                                  class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0B1F3A] transition resize-none"
+                                  placeholder="Describe the issue in detail (e.g., leaking faucet in kitchen, broken AC unit)..."></textarea>
+                    </div>
+                    <button type="submit"
+                            class="w-full bg-[#0B1F3A] hover:bg-[#162d55] text-white font-semibold py-2.5 rounded-lg transition-colors text-sm">
+                        Submit Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requests List -->
+    <div class="lg:col-span-2">
+        {% if requests_list %}
+        <div class="space-y-4">
+            {% for req in requests_list %}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1 mr-4">
+                        <p class="text-sm text-gray-700 leading-relaxed">{{ req.description }}</p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        {% if req.status == 'pending' %}
+                        <span class="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-2.5 py-1 rounded-full">Pending</span>
+                        {% elif req.status == 'in_progress' %}
+                        <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">In Progress</span>
+                        {% else %}
+                        <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">Resolved</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 text-xs text-gray-400">
+                    <span>Submitted {{ req.created_at.strftime('%b %d, %Y') }}</span>
+                    {% if req.resolved_at %}
+                    <span>·</span>
+                    <span class="text-green-600">Resolved {{ req.resolved_at.strftime('%b %d, %Y') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+            <p class="text-gray-400 text-sm">No maintenance requests yet. Use the form to submit one.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

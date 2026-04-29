@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ClearUnit{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B1F3A',
+                        gold: '#C9A84C',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-[#0B1F3A] shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <span class="text-[#C9A84C] text-xl font-bold tracking-widest">CLEAR</span><span class="text-white text-xl font-bold tracking-widest">UNIT</span>
+                    </a>
+                    {% if current_user.is_authenticated %}
+                    <div class="hidden md:flex ml-10 items-baseline space-x-1">
+                        {% if current_user.role == 'manager' %}
+                        <a href="{{ url_for('manager.dashboard') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Dashboard</a>
+                        <a href="{{ url_for('manager.buildings') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Buildings</a>
+                        <a href="{{ url_for('manager.dues') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Dues</a>
+                        <a href="{{ url_for('manager.payments') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Payments</a>
+                        <a href="{{ url_for('manager.maintenance') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Maintenance</a>
+                        <a href="{{ url_for('manager.announcements') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Announcements</a>
+                        {% elif current_user.role == 'resident' %}
+                        <a href="{{ url_for('resident.dashboard') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Dashboard</a>
+                        <a href="{{ url_for('resident.dues') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Dues</a>
+                        <a href="{{ url_for('resident.payments') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Payments</a>
+                        <a href="{{ url_for('resident.maintenance') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Maintenance</a>
+                        <a href="{{ url_for('resident.announcements') }}"
+                           class="text-gray-300 hover:text-[#C9A84C] hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium transition-all">Announcements</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="flex items-center space-x-3">
+                    {% if current_user.is_authenticated %}
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-[#C9A84C] flex items-center justify-center">
+                            <span class="text-[#0B1F3A] text-xs font-bold">{{ current_user.full_name[0].upper() }}</span>
+                        </div>
+                        <span class="text-gray-300 text-sm hidden md:block">{{ current_user.full_name }}</span>
+                    </div>
+                    <a href="{{ url_for('auth.logout') }}"
+                       class="text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 px-3 py-1.5 rounded-md text-sm font-medium transition-all">
+                        Logout
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}"
+                       class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-all">Login</a>
+                    <a href="{{ url_for('auth.register') }}"
+                       class="bg-[#C9A84C] text-[#0B1F3A] hover:bg-yellow-400 px-4 py-2 rounded-md text-sm font-bold transition-all">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4">
+        {% for category, message in messages %}
+        <div class="mb-2 flex items-center px-4 py-3 rounded-lg text-sm font-medium
+            {% if category == 'success' %}bg-green-50 text-green-800 border border-green-200
+            {% elif category == 'danger' %}bg-red-50 text-red-800 border border-red-200
+            {% elif category == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200
+            {% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            <span class="mr-2">
+                {% if category == 'success' %}✓{% elif category == 'danger' %}✕{% elif category == 'warning' %}⚠{% else %}ℹ{% endif %}
+            </span>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#0B1F3A] mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-4 text-center">
+            <span class="text-gray-500 text-xs">© 2026 ClearUnit — Property Management Platform</span>
+        </div>
+    </footer>
+
+</body>
+</html>
