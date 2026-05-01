@@ -2,15 +2,27 @@
 {% block title %}My Payments — ClearUnit{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-8">
+<div class="flex items-center justify-between mb-8 flex-wrap gap-4">
     <div>
         <h1 class="text-2xl font-bold text-[#0B1F3A]">My Payments</h1>
         <p class="text-gray-500 text-sm mt-1">Unit {{ unit.unit_number }} · {{ unit.building.name }}</p>
     </div>
-    <a href="{{ url_for('resident.notify_payment') }}"
-       class="bg-[#C9A84C] text-[#0B1F3A] px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-yellow-400 transition-colors">
-        + Notify Payment
-    </a>
+    <div class="flex items-center gap-3 flex-wrap">
+        {% if units|length > 1 %}
+        <select onchange="window.location.href='{{ url_for('resident.payments') }}?unit_id='+this.value"
+                class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]">
+            {% for u in units %}
+            <option value="{{ u.id }}" {% if u.id == unit.id %}selected{% endif %}>
+                Unit {{ u.unit_number }} — {{ u.building.name }}
+            </option>
+            {% endfor %}
+        </select>
+        {% endif %}
+        <a href="{{ url_for('resident.notify_payment', unit_id=unit.id) }}"
+           class="bg-[#C9A84C] text-[#0B1F3A] px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-yellow-400 transition-colors">
+            + Notify Payment
+        </a>
+    </div>
 </div>
 
 {% if payments_list %}
@@ -51,7 +63,7 @@
 {% else %}
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
     <p class="text-gray-400 text-sm mb-4">No payment records yet.</p>
-    <a href="{{ url_for('resident.notify_payment') }}"
+    <a href="{{ url_for('resident.notify_payment', unit_id=unit.id) }}"
        class="inline-block bg-[#C9A84C] text-[#0B1F3A] px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-yellow-400 transition-colors">
         Notify Your First Payment
     </a>
