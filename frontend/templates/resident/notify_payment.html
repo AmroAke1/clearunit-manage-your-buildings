@@ -4,7 +4,7 @@
 {% block content %}
 <div class="max-w-xl mx-auto">
     <div class="mb-6 flex items-center gap-2 text-sm text-gray-400">
-        <a href="{{ url_for('resident.payments') }}" class="hover:text-[#C9A84C]">Payments</a>
+        <a href="{{ url_for('resident.payments', unit_id=unit.id) }}" class="hover:text-[#C9A84C]">Payments</a>
         <span>›</span>
         <span class="text-gray-600">Notify Payment</span>
     </div>
@@ -20,15 +20,30 @@
             </p>
         </div>
         <div class="px-8 py-8">
+            {% if units|length > 1 %}
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                <select onchange="window.location.href='{{ url_for('resident.notify_payment') }}?unit_id='+this.value"
+                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]">
+                    {% for u in units %}
+                    <option value="{{ u.id }}" {% if u.id == unit.id %}selected{% endif %}>
+                        Unit {{ u.unit_number }} — {{ u.building.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p class="text-xs text-blue-700 font-medium">
-                    ℹ This creates a pending payment record. Your manager will review and confirm or reject it.
+                    This creates a pending payment record. Your manager will review and confirm or reject it.
                     Your balance will only be updated after confirmation.
                 </p>
             </div>
 
             <form method="POST" action="{{ url_for('resident.notify_payment') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="unit_id" value="{{ unit.id }}">
 
                 <div class="mb-5">
                     <label for="month" class="block text-sm font-medium text-gray-700 mb-1">Payment Month</label>
@@ -51,7 +66,7 @@
                             class="bg-[#C9A84C] hover:bg-yellow-400 text-[#0B1F3A] font-bold px-6 py-2.5 rounded-lg transition-colors text-sm">
                         Send Notification
                     </button>
-                    <a href="{{ url_for('resident.payments') }}"
+                    <a href="{{ url_for('resident.payments', unit_id=unit.id) }}"
                        class="text-sm text-gray-500 hover:text-gray-700 transition-colors">Cancel</a>
                 </div>
             </form>
