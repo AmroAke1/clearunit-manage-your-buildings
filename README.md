@@ -228,11 +228,3 @@ psycopg2-binary
 python-dotenv
 ```
 
----
-
-## 📅 Project Phases
-
-| Phase | Deadline | Status |
-|-------|----------|--------|
-| Phase 1 — Architecture Design & SAD v1 | May 4, 2026 | ✅ Complete |
-| Phase 2 — Full Implementation & SAD v2 | May 24, 2026 | 🔄 In Progress |
