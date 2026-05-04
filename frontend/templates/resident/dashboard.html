@@ -7,66 +7,86 @@
     <p class="text-gray-500 text-sm mt-1">Welcome, {{ current_user.full_name }}</p>
 </div>
 
-{% if unit %}
-<!-- Unit Overview Card -->
-<div class="bg-[#0B1F3A] rounded-2xl shadow-lg p-8 mb-8 text-white relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
-    <div class="relative z-10">
-        <div class="flex items-start justify-between">
-            <div>
-                <p class="text-[#C9A84C] text-xs font-semibold uppercase tracking-widest mb-2">Your Unit</p>
-                <h2 class="text-4xl font-bold">Unit {{ unit.unit_number }}</h2>
-                <p class="text-gray-300 mt-1">Floor {{ unit.floor }} · {{ unit.building.name }}</p>
-                <p class="text-gray-400 text-sm mt-0.5">{{ unit.building.address }}</p>
+{% if units %}
+<div class="space-y-8">
+    {% for unit in units %}
+    <!-- Unit Card -->
+    <div>
+        <div class="bg-[#0B1F3A] rounded-2xl shadow-lg p-8 mb-4 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
+            <div class="relative z-10">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[#C9A84C] text-xs font-semibold uppercase tracking-widest mb-2">Your Unit</p>
+                        <h2 class="text-4xl font-bold">Unit {{ unit.unit_number }}</h2>
+                        <p class="text-gray-300 mt-1">Floor {{ unit.floor }} · {{ unit.building.name }}</p>
+                        <p class="text-gray-400 text-sm mt-0.5">{{ unit.building.address }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[#C9A84C] text-xs font-semibold uppercase tracking-widest mb-2">Current Balance</p>
+                        <p class="text-4xl font-bold {% if unit.current_balance > 0 %}text-red-300{% else %}text-green-300{% endif %}">
+                            ${{ "%.2f"|format(unit.current_balance) }}
+                        </p>
+                        {% if unit.current_balance > 0 %}
+                        <p class="text-red-300 text-xs mt-1">Outstanding balance</p>
+                        {% else %}
+                        <p class="text-green-300 text-xs mt-1">All clear</p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="text-right">
-                <p class="text-[#C9A84C] text-xs font-semibold uppercase tracking-widest mb-2">Current Balance</p>
-                <p class="text-4xl font-bold {% if unit.current_balance > 0 %}text-red-300{% else %}text-green-300{% endif %}">
-                    ${{ "%.2f"|format(unit.current_balance) }}
-                </p>
-                {% if unit.current_balance > 0 %}
-                <p class="text-red-300 text-xs mt-1">Outstanding balance</p>
-                {% else %}
-                <p class="text-green-300 text-xs mt-1">All clear</p>
-                {% endif %}
-            </div>
+        </div>
+
+        <!-- Quick Actions for this unit -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a href="{{ url_for('resident.payments', unit_id=unit.id) }}"
+               class="bg-white border border-gray-100 rounded-xl shadow-sm p-5 text-center hover:shadow-md hover:border-[#C9A84C] transition-all group">
+                <div class="w-10 h-10 bg-[#0B1F3A]/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-[#0B1F3A]/20 transition-colors">
+                    <span class="text-lg">💳</span>
+                </div>
+                <p class="text-sm font-semibold text-[#0B1F3A]">My Payments</p>
+                <p class="text-xs text-gray-400 mt-0.5">View history</p>
+            </a>
+            <a href="{{ url_for('resident.notify_payment', unit_id=unit.id) }}"
+               class="bg-[#C9A84C] rounded-xl shadow-sm p-5 text-center hover:shadow-md hover:bg-yellow-400 transition-all">
+                <div class="w-10 h-10 bg-white/30 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <span class="text-lg">📤</span>
+                </div>
+                <p class="text-sm font-bold text-[#0B1F3A]">Notify Payment</p>
+                <p class="text-xs text-[#0B1F3A]/70 mt-0.5">Inform manager</p>
+            </a>
+            <a href="{{ url_for('resident.maintenance', unit_id=unit.id) }}"
+               class="bg-white border border-gray-100 rounded-xl shadow-sm p-5 text-center hover:shadow-md hover:border-[#C9A84C] transition-all group">
+                <div class="w-10 h-10 bg-[#0B1F3A]/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-[#0B1F3A]/20 transition-colors">
+                    <span class="text-lg">🔧</span>
+                </div>
+                <p class="text-sm font-semibold text-[#0B1F3A]">Maintenance</p>
+                <p class="text-xs text-gray-400 mt-0.5">Submit request</p>
+            </a>
+            <a href="{{ url_for('resident.dues', unit_id=unit.id) }}"
+               class="bg-white border border-gray-100 rounded-xl shadow-sm p-5 text-center hover:shadow-md hover:border-[#C9A84C] transition-all group">
+                <div class="w-10 h-10 bg-[#0B1F3A]/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-[#0B1F3A]/20 transition-colors">
+                    <span class="text-lg">🧾</span>
+                </div>
+                <p class="text-sm font-semibold text-[#0B1F3A]">My Dues</p>
+                <p class="text-xs text-gray-400 mt-0.5">View charges</p>
+            </a>
         </div>
     </div>
-</div>
+    {% endfor %}
 
-<!-- Quick Actions -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <a href="{{ url_for('resident.payments') }}"
-       class="bg-white border border-gray-100 rounded-xl shadow-sm p-5 text-center hover:shadow-md hover:border-[#C9A84C] transition-all group">
-        <div class="w-10 h-10 bg-[#0B1F3A]/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-[#0B1F3A]/20 transition-colors">
-            <span class="text-lg">💳</span>
-        </div>
-        <p class="text-sm font-semibold text-[#0B1F3A]">My Payments</p>
-        <p class="text-xs text-gray-400 mt-0.5">View history</p>
-    </a>
-    <a href="{{ url_for('resident.notify_payment') }}"
-       class="bg-[#C9A84C] rounded-xl shadow-sm p-5 text-center hover:shadow-md hover:bg-yellow-400 transition-all">
-        <div class="w-10 h-10 bg-white/30 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <span class="text-lg">📤</span>
-        </div>
-        <p class="text-sm font-bold text-[#0B1F3A]">Notify Payment</p>
-        <p class="text-xs text-[#0B1F3A]/70 mt-0.5">Inform manager</p>
-    </a>
-    <a href="{{ url_for('resident.maintenance') }}"
-       class="bg-white border border-gray-100 rounded-xl shadow-sm p-5 text-center hover:shadow-md hover:border-[#C9A84C] transition-all group">
-        <div class="w-10 h-10 bg-[#0B1F3A]/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-[#0B1F3A]/20 transition-colors">
-            <span class="text-lg">🔧</span>
-        </div>
-        <p class="text-sm font-semibold text-[#0B1F3A]">Maintenance</p>
-        <p class="text-xs text-gray-400 mt-0.5">Submit request</p>
-    </a>
+    <!-- Announcements link (spans all units) -->
     <a href="{{ url_for('resident.announcements') }}"
-       class="bg-white border border-gray-100 rounded-xl shadow-sm p-5 text-center hover:shadow-md hover:border-[#C9A84C] transition-all group">
-        <div class="w-10 h-10 bg-[#0B1F3A]/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-[#0B1F3A]/20 transition-colors">
-            <span class="text-lg">📢</span>
+       class="block bg-white border border-gray-100 rounded-xl shadow-sm p-5 hover:shadow-md hover:border-[#C9A84C] transition-all group">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-[#0B1F3A]/10 rounded-lg flex items-center justify-center group-hover:bg-[#0B1F3A]/20 transition-colors">
+                <span class="text-lg">📢</span>
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-[#0B1F3A]">Announcements</p>
+                <p class="text-xs text-gray-400 mt-0.5">Building notices from all your buildings</p>
+            </div>
         </div>
-        <p class="text-sm font-semibold text-[#0B1F3A]">Announcements</p>
-        <p class="text-xs text-gray-400 mt-0.5">Building notices</p>
     </a>
 </div>
 

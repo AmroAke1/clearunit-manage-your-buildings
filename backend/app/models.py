@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), nullable=False)
 
     managed_buildings = db.relationship('Building', backref='manager', lazy=True, foreign_keys='Building.manager_id')
-    unit = db.relationship('Unit', backref='resident', uselist=False, foreign_keys='Unit.resident_id')
+    units = db.relationship('Unit', backref='resident', lazy=True, foreign_keys='Unit.resident_id')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

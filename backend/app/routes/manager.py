@@ -127,9 +127,6 @@ def add_unit(building_id):
         if resident_id_str:
             try:
                 resident_id = int(resident_id_str)
-                if Unit.query.filter_by(resident_id=resident_id).first():
-                    flash('This resident is already assigned to another unit.', 'danger')
-                    return render_template('manager/add_unit.html', building=building, residents=residents)
             except ValueError:
                 resident_id = None
         unit = Unit(unit_number=unit_number, floor=floor, building_id=building_id, resident_id=resident_id)
@@ -151,10 +148,6 @@ def assign_resident(unit_id):
     if resident_id_str:
         try:
             resident_id = int(resident_id_str)
-            existing = Unit.query.filter_by(resident_id=resident_id).filter(Unit.id != unit_id).first()
-            if existing:
-                flash('This resident is already assigned to another unit.', 'danger')
-                return redirect(url_for('manager.building_detail', building_id=unit.building_id))
         except ValueError:
             resident_id = None
     unit.resident_id = resident_id
