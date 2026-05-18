@@ -82,9 +82,9 @@ jobs:
 
       - name: Verify app starts
         run: |
-          cd backend
           python -c "
-          import sys, os
+          import sys
+          sys.path.insert(0, 'backend')
           sys.path.insert(0, '.')
           from app import create_app, db
           app = create_app()
