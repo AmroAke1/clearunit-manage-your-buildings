@@ -23,7 +23,7 @@ jobs:
         run: pip install -r requirements.txt flake8
 
       - name: Run flake8
-        run: flake8 backend/ run.py config.py --max-line-length=120 --exclude=__pycache__,migrations
+        run: flake8 backend/ run.py config.py
 
   security:
     name: Security scan
