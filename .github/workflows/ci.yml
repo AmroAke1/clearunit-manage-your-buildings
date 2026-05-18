@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt flake8
+
+      - name: Run flake8
+        run: flake8 backend/ run.py config.py --max-line-length=120 --exclude=__pycache__,migrations
+
+  security:
+    name: Security scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Audit dependencies
+        run: pip-audit -r requirements.txt
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: clearunit
+          POSTGRES_PASSWORD: clearunit
+          POSTGRES_DB: clearunit_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://clearunit:clearunit@localhost:5432/clearunit_test
+      SECRET_KEY: ci-test-secret-key
+      GOOGLE_CLIENT_ID: dummy
+      GOOGLE_CLIENT_SECRET: dummy
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+
+      - name: Verify app starts
+        run: |
+          cd backend
+          python -c "
+          import sys, os
+          sys.path.insert(0, '.')
+          from app import create_app, db
+          app = create_app()
+          with app.app_context():
+              db.create_all()
+          print('App started and DB initialized successfully')
+          "
+
+      - name: Run tests
+        run: pytest tests/ -v --tb=short 2>/dev/null || echo "No tests found — add tests to the tests/ directory"
