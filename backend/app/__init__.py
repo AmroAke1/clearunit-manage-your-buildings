@@ -4,6 +4,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from flask_jwt_extended import JWTManager
+from authlib.integrations.flask_client import OAuth
 from config import Config
 
 db = SQLAlchemy()
@@ -11,6 +12,7 @@ login_manager = LoginManager()
 migrate = Migrate()
 csrf = CSRFProtect()
 jwt = JWTManager()
+oauth = OAuth()
 
 
 def create_app():
@@ -24,6 +26,12 @@ def create_app():
     migrate.init_app(app, db)
     csrf.init_app(app)
     jwt.init_app(app)
+    oauth.init_app(app)
+    oauth.register(
+        name='google',
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+        client_kwargs={'scope': 'openid email profile'},
+    )
 
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'

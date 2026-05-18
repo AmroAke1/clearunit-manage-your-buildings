@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Complete Sign Up — ClearUnit{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center py-8">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold">
+                <span class="text-[#C9A84C]">CLEAR</span><span class="text-[#0B1F3A]">UNIT</span>
+            </h1>
+            <p class="text-gray-500 mt-2 text-sm">Property Management Platform</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-[#0B1F3A] px-8 py-5">
+                <h2 class="text-white text-xl font-semibold">One Last Step</h2>
+                <p class="text-gray-400 text-sm mt-1">Signed in as {{ google_user.email }}</p>
+            </div>
+            <div class="px-8 py-8">
+                <p class="text-gray-600 text-sm mb-6">
+                    Welcome, <span class="font-semibold text-[#0B1F3A]">{{ google_user.full_name }}</span>!
+                    Please select your account type to continue.
+                </p>
+
+                <form method="POST" action="{{ url_for('auth.google_complete') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-6 space-y-3">
+                        <label class="flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#0B1F3A] transition-colors has-[:checked]:border-[#0B1F3A] has-[:checked]:bg-[#0B1F3A]/5">
+                            <input type="radio" name="role" value="manager" class="mt-1 accent-[#0B1F3A]" required>
+                            <div>
+                                <p class="font-semibold text-[#0B1F3A] text-sm">Property Manager</p>
+                                <p class="text-gray-500 text-xs mt-0.5">Manage buildings, units, dues and residents</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-[#C9A84C] transition-colors has-[:checked]:border-[#C9A84C] has-[:checked]:bg-[#C9A84C]/5">
+                            <input type="radio" name="role" value="resident" class="mt-1 accent-[#C9A84C]">
+                            <div>
+                                <p class="font-semibold text-[#0B1F3A] text-sm">Resident</p>
+                                <p class="text-gray-500 text-xs mt-0.5">View dues, submit maintenance requests and payments</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <button type="submit"
+                            class="w-full bg-[#0B1F3A] hover:bg-[#162d55] text-white font-semibold py-3 rounded-lg transition-colors text-sm">
+                        Complete Registration
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -7,9 +7,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=True)
     full_name = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20), nullable=False)
+    google_id = db.Column(db.String(100), unique=True, nullable=True)
 
     managed_buildings = db.relationship('Building', backref='manager', lazy=True, foreign_keys='Building.manager_id')
     units = db.relationship('Unit', backref='resident', lazy=True, foreign_keys='Unit.resident_id')
@@ -18,6 +19,8 @@ class User(UserMixin, db.Model):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
+        if not self.password_hash:
+            return False
         return check_password_hash(self.password_hash, password)
 
 
