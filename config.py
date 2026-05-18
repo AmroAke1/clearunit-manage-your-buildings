@@ -12,3 +12,4 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-secret-key')
     GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
     GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+    PREFERRED_URL_SCHEME = "https"
